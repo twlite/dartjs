@@ -21,8 +21,6 @@
     "bumpdeps": "npm-check-updates -u",
     "format": "prettier --write src/**/*.{ts,js,json,yaml,yml}",
     "prepublishOnly": "rollup-type-bundler -e stream",
-    "docs": "docgen --jsdoc jsdoc.json --source src/*.ts src/**/*.ts --custom docs/index.yml --output docs/docs.json",
-    "docs:test": "docgen --jsdoc jsdoc.json --source src/*.ts src/**/*.ts --custom docs/index.yml",
     "test": "jest"
   },
   "repository": {
