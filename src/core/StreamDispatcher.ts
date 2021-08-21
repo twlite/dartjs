@@ -1,7 +1,7 @@
 import { createAudioResource, createAudioPlayer, AudioResource, StreamType, AudioPlayerStatus, VoiceConnectionStatus, VoiceConnectionDisconnectReason, entersState } from "@discordjs/voice";
 import type { Readable } from "stream";
 import { TypedEmitter as EventEmitter } from "tiny-typed-emitter";
-import { DispatcherEvents } from "..";
+import { DispatcherEvents, PlayOptions } from "../types/types";
 import { wait } from "../Utils/Util";
 import VoiceConnection from "./VoiceConnection";
 
@@ -23,6 +23,7 @@ export default class StreamDispatcher extends EventEmitter<DispatcherEvents> {
                     try {
                         await entersState(this.connection.voice, VoiceConnectionStatus.Connecting, 5_000);
                     } catch {
+                        this.connection.manager.connections.delete(this.connection.channel.guildId);
                         this.connection.emit("disconnect");
                         this.connection.voice.destroy();
                     }
@@ -30,6 +31,7 @@ export default class StreamDispatcher extends EventEmitter<DispatcherEvents> {
                     await wait((this.connection.voice.rejoinAttempts + 1) * 5_000);
                     this.connection.voice.rejoin();
                 } else {
+                    this.connection.manager.connections.delete(this.connection.channel.guildId);
                     this.connection.emit("disconnect");
                     this.connection.voice.destroy();
                 }
@@ -41,6 +43,7 @@ export default class StreamDispatcher extends EventEmitter<DispatcherEvents> {
                     await entersState(this.connection.voice, VoiceConnectionStatus.Ready, 20_000);
                 } catch {
                     if (this.connection.voice.state.status !== VoiceConnectionStatus.Destroyed) this.connection.voice.destroy();
+                    this.connection.manager.connections.delete(this.connection.channel.guildId);
                     this.connection.emit("disconnect");
                 } finally {
                     this.readyLock = false;
@@ -60,10 +63,10 @@ export default class StreamDispatcher extends EventEmitter<DispatcherEvents> {
         this.audioPlayer.on("error", (error) => void this.emit("error", error));
     }
 
-    playStream(stream: Readable | string) {
+    playStream(stream: Readable | string, options?: PlayOptions) {
         this.audioResource = createAudioResource(stream, {
-            inputType: StreamType.Arbitrary,
-            inlineVolume: true
+            inputType: (options?.type as StreamType) || StreamType.Arbitrary,
+            inlineVolume: options?.inlineVolume ?? true
         });
 
         this.audioPlayer.play(this.audioResource);

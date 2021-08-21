@@ -23,7 +23,7 @@ export default class DartVoiceManager {
                 return connection;
             }
         } else {
-            const connection = await VoiceConnection.createConnection(vc);
+            const connection = await VoiceConnection.createConnection(vc, this);
             this.connections.set(vc.guildId, connection);
 
             return connection;

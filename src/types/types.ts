@@ -1,4 +1,6 @@
+import { StreamType } from "@discordjs/voice";
 import type { VoiceChannel, StageChannel } from "discord.js";
+import type { DartVoiceManager } from "../core/DartVoiceManager";
 
 export type VoiceChannels = VoiceChannel | StageChannel;
 
@@ -18,4 +20,10 @@ export interface DispatcherEvents {
 
 export interface VoiceConnectionData {
     channel: VoiceChannels;
+    manager: DartVoiceManager;
+}
+
+export interface PlayOptions {
+    type?: `${StreamType}`;
+    inlineVolume?: boolean;
 }

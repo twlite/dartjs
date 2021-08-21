@@ -1,14 +1,16 @@
 import { joinVoiceChannel, entersState, VoiceConnectionStatus, VoiceConnection as VoiceConnectionNative } from "@discordjs/voice";
 import { TypedEmitter as EventEmitter } from "tiny-typed-emitter";
-import { VoiceChannels, VoiceEvents, VoiceConnectionData } from "../types/types";
+import { VoiceChannels, VoiceEvents, VoiceConnectionData, PlayOptions } from "../types/types";
 import { catchError } from "../Utils/Util";
 import type { Readable } from "stream";
 import StreamDispatcher from "./StreamDispatcher";
+import type { DartVoiceManager } from "./DartVoiceManager";
 
 export default class VoiceConnection extends EventEmitter<VoiceEvents> {
     public readonly client = this.options.channel.client;
     public readonly channel = this.options.channel;
     public dispatcher: StreamDispatcher = null;
+    public readonly manager = this.options.manager;
 
     public constructor(public voice: VoiceConnectionNative, public readonly options: VoiceConnectionData) {
         super();
@@ -18,16 +20,18 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
     }
 
     public disconnect() {
+        this.manager.connections.delete(this.channel.guildId);
         this.voice.destroy();
     }
 
-    public static createConnection(channel: VoiceChannels): Promise<VoiceConnection> {
+    public static createConnection(channel: VoiceChannels, manager: DartVoiceManager): Promise<VoiceConnection> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
             const [error, connection] = await catchError(() => VoiceConnection.joinChannel(channel));
             if (error) return reject(error);
             const vc = new VoiceConnection(connection, {
-                channel
+                channel,
+                manager
             });
             resolve(vc);
         });
@@ -50,13 +54,13 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         });
     }
 
-    public play(stream: Readable | string) {
+    public play(stream: Readable | string, options?: PlayOptions) {
         if (!this.dispatcher) {
             const dispatcher = new StreamDispatcher(this);
             this.dispatcher = dispatcher;
         }
 
-        this.dispatcher.playStream(stream);
+        this.dispatcher.playStream(stream, options);
         return this.dispatcher;
     }
 
