@@ -3,5 +3,6 @@ dist/
 .github/
 docs/
 coverage/
+test/
 
 *.d.ts
