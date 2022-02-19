@@ -1,4 +1,4 @@
-import { StreamType } from "@discordjs/voice";
+import { JoinConfig, StreamType } from "@discordjs/voice";
 import type { VoiceChannel, StageChannel } from "discord.js";
 import type { DartVoiceManager } from "../core/DartVoiceManager";
 
@@ -8,6 +8,10 @@ export interface VoiceEvents {
     debug: (message: string) => void;
     error: (error: Error) => void;
     disconnect: () => void;
+}
+
+export interface VoiceReceiverEvents {
+    debug: (message: string) => void;
 }
 
 export interface DispatcherEvents {
@@ -24,6 +28,13 @@ export interface VoiceConnectionData {
 }
 
 export interface PlayOptions {
-    type?: `${StreamType}`;
+    type?: `${StreamType}` | StreamType;
     inlineVolume?: boolean;
 }
+
+export interface ReceiveStreamOptions {
+    mode?: "opus" | "pcm";
+    end?: "silence" | "manual";
+}
+
+export type VoiceJoinConfig = Omit<JoinConfig, "channelId" | "guildId">;

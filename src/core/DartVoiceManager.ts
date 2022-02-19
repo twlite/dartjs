@@ -1,13 +1,13 @@
 import type { Client, Snowflake, GuildVoiceChannelResolvable, VoiceBasedChannelTypes } from "discord.js";
 import { Collection } from "discord.js";
 import VoiceConnection from "./VoiceConnection";
-import { VoiceChannels } from "../types/types";
+import { VoiceChannels, VoiceJoinConfig } from "../types/types";
 
 export default class DartVoiceManager {
     public connections = new Collection<Snowflake, VoiceConnection>();
     public constructor(public readonly client: Client) {}
 
-    public async join(channel: GuildVoiceChannelResolvable) {
+    public async join(channel: GuildVoiceChannelResolvable, options?: VoiceJoinConfig) {
         const vc = this.client.channels.resolve(channel ?? "");
         if (!vc || !vc.isVoice()) throw new Error("Voice channel was not provided!");
 
@@ -23,7 +23,7 @@ export default class DartVoiceManager {
                 return connection;
             }
         } else {
-            const connection = await VoiceConnection.createConnection(vc, this);
+            const connection = await VoiceConnection.createConnection(vc, this, options);
             this.connections.set(vc.guildId, connection);
 
             return connection;
