@@ -30,6 +30,22 @@ export default class DartVoiceManager {
         }
     }
 
+    public leave(channel: GuildVoiceChannelResolvable) {
+        const vc = this.client.channels.resolve(channel ?? "");
+        if (!vc || !vc.isVoice()) throw new Error("Voice channel was not provided!");
+
+        if (!(["GUILD_STAGE_VOICE", "GUILD_VOICE"] as VoiceBasedChannelTypes[]).includes(vc.type)) {
+            throw new TypeError("Cannot leave non-voice channel");
+        }
+
+        if (!this.connections.has(vc.guildId)) return;
+
+        const connection = this.connections.get(vc.guildId);
+        connection.disconnect();
+        connection.destroy();
+        this.connections.delete(vc.guildId);
+    }
+
     public async updateChannel(connection: VoiceConnection, channel: VoiceChannels) {
         const vc = await VoiceConnection.joinChannel(channel);
         connection.voice = vc;

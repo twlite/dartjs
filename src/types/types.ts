@@ -28,7 +28,7 @@ export interface VoiceConnectionData {
 }
 
 export interface PlayOptions {
-    type?: `${StreamType}` | StreamType;
+    type?: `${StreamType}` | StreamType | "converted" | "unknown";
     inlineVolume?: boolean;
 }
 

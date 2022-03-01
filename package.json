@@ -1,6 +1,6 @@
 {
   "name": "dartjs",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Very simple framework that provides discord.js v12 voice interface",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -24,20 +24,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CesiumLabs/dartjs.git"
+    "url": "git+https://github.com/DevAndromeda/dartjs.git"
   },
   "keywords": [
     "dartjs",
     "discord",
     "voice",
-    "v12"
+    "v12",
+    "v13",
+    "discord.js-v12-voice",
+    "discord.js-v13-voice",
+    "discord.js-v12-voice-v13"
   ],
   "author": "DevAndromeda",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/CesiumLabs/dartjs/issues"
+    "url": "https://github.com/DevAndromeda/dartjs/issues"
   },
-  "homepage": "https://github.com/CesiumLabs/typescript-template#readme",
+  "homepage": "https://github.com/DevAndromeda/typescript-template#readme",
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.3",
     "@types/node": "^16.7.1",

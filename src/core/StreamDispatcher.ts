@@ -85,7 +85,16 @@ export default class StreamDispatcher extends EventEmitter<DispatcherEvents> {
 
     public playStream(stream: Readable | string, options?: PlayOptions) {
         this.audioResource = createAudioResource(stream, {
-            inputType: (options?.type as StreamType) || StreamType.Arbitrary,
+            inputType:
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                {
+                    // discord.js v12 types
+                    converted: StreamType.Raw,
+                    unknown: StreamType.Arbitrary
+                }[options?.type as StreamType] ||
+                (options?.type as StreamType) ||
+                StreamType.Arbitrary,
             inlineVolume: options?.inlineVolume ?? true
         });
 

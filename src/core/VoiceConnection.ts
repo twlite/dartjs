@@ -24,6 +24,16 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
 
     public disconnect() {
         try {
+            this.dispatcher.removeAllListeners();
+            this.receiver.removeAllListeners();
+            this.voice.disconnect();
+        } catch {
+            /* noop */
+        }
+    }
+
+    public destroy() {
+        try {
             this.voiceManager.connections.delete(this.channel.guildId);
             this.dispatcher.removeAllListeners();
             this.receiver.removeAllListeners();
@@ -80,7 +90,9 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
     }
 
     public get ping() {
-        return this.voice.ping;
+        const latency = this.voice.ping.udp;
+
+        return typeof latency !== "number" ? NaN : latency;
     }
 }
 
