@@ -1,4 +1,4 @@
-import { joinVoiceChannel, entersState, VoiceConnectionStatus, VoiceConnection as VoiceConnectionNative, DiscordGatewayAdapterCreator } from "@discordjs/voice";
+import { joinVoiceChannel, entersState, VoiceConnectionStatus, VoiceConnection as VoiceConnectionNative, DiscordGatewayAdapterCreator, NoSubscriberBehavior } from "@discordjs/voice";
 import { TypedEmitter as EventEmitter } from "tiny-typed-emitter";
 import { VoiceChannels, VoiceEvents, VoiceConnectionData, PlayOptions, VoiceJoinConfig } from "../types/types";
 import { catchError } from "../Utils/Util";
@@ -18,10 +18,16 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         super();
     }
 
+    /**
+     * The audio player
+     */
     public get audioPlayer() {
         return this.dispatcher?.audioPlayer;
     }
 
+    /**
+     * Disconnect from this connection
+     */
     public disconnect() {
         try {
             this.dispatcher.removeAllListeners();
@@ -32,6 +38,9 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         }
     }
 
+    /**
+     * Destroy this connection
+     */
     public destroy() {
         try {
             this.voiceManager.connections.delete(this.channel.guildId);
@@ -43,6 +52,12 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         }
     }
 
+    /**
+     * Create a voice connection
+     * @param channel The voice channel
+     * @param manager The voice manager
+     * @param options Join config
+     */
     public static createConnection(channel: VoiceChannels, manager: DartVoiceManager, options?: VoiceJoinConfig): Promise<VoiceConnection> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
@@ -56,6 +71,11 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         });
     }
 
+    /**
+     * Join a voice channel
+     * @param channel The voice channel
+     * @param options The join config
+     */
     public static joinChannel(channel: VoiceChannels, options?: VoiceJoinConfig): Promise<VoiceConnectionNative> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
@@ -76,19 +96,45 @@ export default class VoiceConnection extends EventEmitter<VoiceEvents> {
         });
     }
 
-    public play(stream: Readable | string, options?: PlayOptions) {
+    /**
+     * Play readable stream or remote stream source in this connection
+     * @param stream The stream source
+     * @param options The play options
+     */
+    public play<T = unknown>(
+        stream: Readable | string,
+        options?: PlayOptions<T> & {
+            behaviours?: {
+                noSubscriber?: NoSubscriberBehavior;
+                maxMissedFrames?: number;
+            };
+        }
+    ) {
         if (!this.dispatcher) {
-            const dispatcher = new StreamDispatcher(this);
+            const dispatcher = new StreamDispatcher(
+                this,
+                options?.behaviours
+                    ? {
+                          behaviors: options.behaviours
+                      }
+                    : {}
+            );
             this.dispatcher = dispatcher;
         }
         this.dispatcher.playStream(stream, options);
-        return this.dispatcher;
+        return this.dispatcher as StreamDispatcher<T>;
     }
 
+    /**
+     * The voice connection status
+     */
     public get status() {
         return this.voice.state.status;
     }
 
+    /**
+     * The voice connection latency (udp)
+     */
     public get ping() {
         const latency = this.voice.ping.udp;
 

@@ -16,6 +16,11 @@ export class VoiceReceiver extends EventEmitter<VoiceReceiverEvents> {
         this.connection.voice.receiver.speaking.removeAllListeners("end");
     }
 
+    /**
+     * Create receiver stream
+     * @param user The target user to listen to
+     * @param options Receiver options
+     */
     public createStream(user: UserResolvable, options: ReceiveStreamOptions = {}) {
         const _user = this.client.users.resolveId(user);
         options ??= { end: "silence", mode: "opus" };

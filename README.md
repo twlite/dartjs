@@ -99,4 +99,26 @@ client.on("messageCreate", message => {
 client.login("XXX");
 ```
 
-See **[https://github.com/discord-player/voice-recorder-example](https://github.com/discord-player/voice-recorder-example)** for a complete voice recorder example.
+> See **[https://github.com/discord-player/voice-recorder-example](https://github.com/discord-player/voice-recorder-example)** for a complete voice recorder example.
+
+### Smooth Volume
+
+This feature enables smooth volume transition.
+
+> This library will attempt to polyfill smooth volume api by default. This can be disabled by setting `DARTJS_DISABLE_INJECTION` in env.
+
+**Example:**
+
+```js
+// injecting manually
+require("dartjs").injectSmoothVolume();
+
+// Set smoothness before playing
+dispatcher.play(stream, {
+    // use whatever value feels better
+    volumeSmoothness: 0.08
+});
+
+// setting smoothness on-the-fly
+dispatcher.setVolumeSmoothness(0.08)
+```

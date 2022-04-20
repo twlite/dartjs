@@ -14,3 +14,7 @@ export function wait(duration: number) {
         setTimeout(resolve, duration).unref();
     });
 }
+
+export function randomId() {
+    return `${Date.now()}::${Math.random().toString(32)}`;
+}
